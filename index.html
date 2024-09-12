@@ -15,31 +15,27 @@
             margin: 0;
             padding: 0;
             height: 100%;
-            background-color: #121212;
+            background-color: #000;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #ffffff;
+            color: #fff;
             overflow: hidden;
-        }
-        
-        /* Darkmode Styling */
-        .darkmode {
-            background-color: #121212;
-            color: #ffffff;
         }
 
         /* Fly-in Animation */
         .fly-in {
             position: absolute;
-            top: 50%;
+            top: 30%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 3rem;
+            font-size: 4rem;
             font-weight: bold;
             opacity: 0;
-            animation: flyIn 2s ease-out forwards;
+            animation: flyIn 3s ease-out forwards;
+            text-shadow: 0px 0px 10px rgba(255, 255, 255, 0.7);
+            color: #fff;
         }
 
-        /* Keyframes for fly-in animation */
+        /* Fly-in Keyframes */
         @keyframes flyIn {
             0% {
                 transform: translate(-50%, -150%);
@@ -56,23 +52,25 @@
             display: inline-block;
             padding: 15px 30px;
             margin-top: 30px;
-            background-color: #ff6600;
-            color: #fff;
+            background-color: #ffffff;
+            color: #000;
             text-decoration: none;
             font-size: 1.2rem;
             font-weight: bold;
             border-radius: 30px;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s, color 0.3s;
+            box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.3);
         }
 
         .cta-button:hover {
-            background-color: #ff9933;
+            background-color: #000;
+            color: #fff;
         }
 
         /* Section Styling */
         .content {
             position: absolute;
-            bottom: 50px;
+            bottom: 80px;
             left: 50%;
             transform: translateX(-50%);
             text-align: center;
@@ -105,29 +103,55 @@
     </div>
 
     <script>
-        // Three.js for simple 3D background animation
+        // Three.js for 3D interactive background animation
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ canvas: document.querySelector('#bg'), alpha: true });
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(window.innerWidth, window.innerHeight);
-        camera.position.setZ(30);
+        camera.position.setZ(50);
 
-        // Create a 3D cube
-        const geometry = new THREE.BoxGeometry(10, 10, 10);
-        const material = new THREE.MeshStandardMaterial({ color: 0xff6600 });
-        const cube = new THREE.Mesh(geometry, material);
+        // Geometry for rotating cube
+        const cubeGeometry = new THREE.BoxGeometry(10, 10, 10);
+        const cubeMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, wireframe: true });
+        const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
         scene.add(cube);
 
+        // Add some fun floating spheres
+        const sphereGeometry = new THREE.SphereGeometry(2, 32, 32);
+        const sphereMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, wireframe: true });
+        
+        const spheres = [];
+        for (let i = 0; i < 10; i++) {
+            const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+            sphere.position.set(
+                (Math.random() - 0.5) * 100,
+                (Math.random() - 0.5) * 100,
+                (Math.random() - 0.5) * 100
+            );
+            spheres.push(sphere);
+            scene.add(sphere);
+        }
+
         // Add lighting to the scene
-        const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
         scene.add(ambientLight);
 
-        // Animation loop to rotate the cube
+        const pointLight = new THREE.PointLight(0xffffff, 1);
+        pointLight.position.set(25, 25, 25);
+        scene.add(pointLight);
+
+        // Animation loop to rotate the cube and move spheres
         function animate() {
             requestAnimationFrame(animate);
             cube.rotation.x += 0.01;
             cube.rotation.y += 0.01;
+
+            spheres.forEach(sphere => {
+                sphere.position.x += Math.sin(sphere.position.y * 0.01) * 0.05;
+                sphere.position.y += Math.cos(sphere.position.x * 0.01) * 0.05;
+            });
+
             renderer.render(scene, camera);
         }
 
